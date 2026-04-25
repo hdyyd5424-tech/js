@@ -2,7 +2,10 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 import random
-new_token = 'vk1.a.TtdRseUgbhI1CAqmAehZdmVCyUm16PfJZ2IbjbXPJj5Z5DWBJGigOB-whfvvW6gubtX7ET_qV8sijLMiZAv-0mv_sqx4JD0q6jgkis6ByEc6B6YNw9ZujlmD05zDjZL6OgBZmD--z2o3PT0w8wautqolRt5Ae4P8-gOT5aN5sqQzNqy9VeI-FfCPtA-j2cCUgQr2v9mc8voPaCb8G3SXhA'
+import os
+from dotenv import load_dotenv
+load_dotenv()
+new_token = os.getenv('BOT_TOKEN')
 old_token = 'vk1.a.mXrRpgPJA-bwuyIov4iafRQyZrKkO9ksxMrvzQu1i9qPcCkyMG0rBVLK2UY1dhhPi7nid7LvNH1rkHJ7viio23TqWlv2uv7BuFcdMRNGr4xnaIvDk5K2yB6z4-y1NvOlpWi8HlMDwnZd-2D5Ve6fEdtWrERaYU7CACAGpI43II6zJq3iSdU9zNn48WO18uMOfJ8IONFFDRUVbKsrVJD2Fg'
 vk_session = vk_api.VkApi(token = new_token)
 session_api = vk_session.get_api()
