@@ -5,7 +5,7 @@ import random
 import os
 from dotenv import load_dotenv
 from vk_api import VkUpload
-upload = VkUpload(vk_session)
+
 
 
 load_dotenv()
@@ -15,7 +15,7 @@ vk_session = vk_api.VkApi(token = new_token)
 session_api = vk_session.get_api()
 longpoll = VkLongPoll(vk_session)
 adm_id = 17692663
-
+upload = VkUpload(vk_session)
 
 def get_photo_attachment(photo_path):
     try:
