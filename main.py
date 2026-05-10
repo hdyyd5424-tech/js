@@ -7,14 +7,6 @@ from dotenv import load_dotenv
 from vk_api import VkUpload
 upload = VkUpload(vk_session)
 
-def get_photo_attachment(photo_path):
-    try:
-        photo = upload.photo_messages(photos=photo_path)[0]
-        return f"photo{photo['owner_id']}_{photo['id']}"
-    except Exception as e:
-        print(f"Ошибка загрузки фото: {e}")
-        return None
-
 
 load_dotenv()
 new_token = os.getenv('BOT_TOKEN')
@@ -23,6 +15,15 @@ vk_session = vk_api.VkApi(token = new_token)
 session_api = vk_session.get_api()
 longpoll = VkLongPoll(vk_session)
 adm_id = 17692663
+
+
+def get_photo_attachment(photo_path):
+    try:
+        photo = upload.photo_messages(photos=photo_path)[0]
+        return f"photo{photo['owner_id']}_{photo['id']}"
+    except Exception as e:
+        print(f"Ошибка загрузки фото: {e}")
+        return None
 
 def send_msg(id, text, keyboard = None):
     post = {
