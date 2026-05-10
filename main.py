@@ -17,10 +17,16 @@ adm_id = 17692663
 upload = VkUpload(vk_session)
 
 def get_photo_attachment(photo_path):
+    if not os.path.exists(photo_path):
+        print(f"!!! ФАЙЛ НЕ НАЙДЕН: {photo_path}")
+        return None
     try:
-        # Важно: файл должен быть в той же папке или по полному пути
-        photo = upload.photo_messages(photos=photo_path)[0]
-        return f"photo{photo['owner_id']}_{photo['id']}"
+        response = upload.photo_messages(photos=photo_path)
+        print(f"Ответ VK при загрузке: {response}") # Посмотрим, что пришло
+        if response:
+            photo = response[0]
+            return f"photo{photo['owner_id']}_{photo['id']}"
+        return None
     except Exception as e:
         print(f"Ошибка загрузки фото: {e}")
         return None
