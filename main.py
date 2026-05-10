@@ -92,8 +92,12 @@ while True:
                     if msg == "да":
                         kb = VkKeyboard(one_time=False)
                         kb.add_openlink_button(label='Перейти в сообщество', link='https://vk.com/club148920320')
-                        
-                        photo = get_photo_attachment("my_photo.jpg") # УБЕДИСЬ, ЧТО ФАЙЛ СУЩЕСТВУЕТ
+                        photo_filename = "my_photo.jpg"
+                        if os.path.exists(photo_filename):
+                            photo = get_photo_attachment(photo_filename)
+                        else:
+                            print(f"Файл {photo_filename} не найден в директории {os.getcwd()}")
+                            photo = None
                         final_text = "Отлично, я свяжусь с вами в ближайшее время, а также рекомендую подписаться на мою группу и получать полезные фишки."
                         
                         send_msg(user_id, final_text, kb, attachment=photo)
