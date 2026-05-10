@@ -5,7 +5,8 @@ from vk_api import VkUpload
 import random
 import os
 from dotenv import load_dotenv
-
+base_path = os.path.dirname(os.path.abspath(__file__))
+photo_path = os.path.join(base_path, "my_photo.jpg")
 load_dotenv()
 new_token = os.getenv('BOT_TOKEN')
 
