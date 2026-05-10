@@ -126,17 +126,101 @@ while True:
                     if next_step_idx < len(steps):
                         kb = None
                         # Проверка на спец. клавиатуры для конкретных шагов
-                        if next_step_idx == 5:
-                            kb = VkKeyboard(one_time=True)
-                            kb.add_button("Снижение веса", VkKeyboardColor.PRIMARY)
-                            kb.add_button("Набор массы", VkKeyboardColor.PRIMARY)
-                            kb.add_line()
-                            kb.add_button("Разобраться в питании", VkKeyboardColor.PRIMARY)
-                            kb.add_button("Улучшить самочувствие", VkKeyboardColor.PRIMARY)
-                        elif next_idx == 20: # Способ связи
-                            kb = VkKeyboard(one_time=True)
-                            kb.add_button("Telegram", VkKeyboardColor.PRIMARY)
-                            kb.add_button("Vk", VkKeyboardColor.PRIMARY)
+                            if next_step_idx == 5:
+
+                                keyboard.add_button("Снижение веса", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Набор массы", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_line()
+
+                                keyboard.add_button("Разобраться в питании", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Улучшить самочувствие", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_line()
+
+                                keyboard.add_button("Качество тела", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Наладить работу ЖКТ", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_line()
+
+                                keyboard.add_button("Наладить сон", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Повысить энергию", VkKeyboardColor.PRIMARY)
+
+                                send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
+
+                            elif next_step_idx == 20:
+
+                                keyboard.add_button("Telegram", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Vk", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_line()
+
+                                keyboard.add_button("Max", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("ZOOM", VkKeyboardColor.PRIMARY)
+
+                                send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
+
+                            elif next_step_idx == 7:
+
+                                keyboard.add_button("12ч", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("13ч", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("14ч", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("15ч", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_line()
+
+                                keyboard.add_button("нет обеда совсем", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("только небольшие перекусы", VkKeyboardColor.PRIMARY)
+
+                                send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
+
+                            elif next_step_idx == 17:
+
+                                keyboard.add_button("нет", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("До 0,5 литров", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("От 0,5 до 1 литра", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_line()
+
+                                keyboard.add_button("От 1 до 2 литров", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Более 2 литров", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Пью в основном чай / кофе / газировки", VkKeyboardColor.PRIMARY)
+
+                                send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
+
+                            elif next_step_idx == 18:
+
+                                keyboard.add_button("Вздутие живота", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Диарея", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Запоры", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_line()
+
+                                keyboard.add_button("Изжога", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Нет", VkKeyboardColor.PRIMARY)
+
+                                keyboard.add_button("Реакция на определенные продукты", VkKeyboardColor.PRIMARY)
+
+                                #keyboard.add_button("Другое", VkKeyboardColor.PRIMARY)
+
+                                send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
 
                         send_msg(user_id, questions[steps[next_step_idx]], kb)
                     
