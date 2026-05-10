@@ -71,14 +71,6 @@ while True:
                 if event.to_me:
                     msg = event.text.lower()
                     id = event.user_id
-                    if id in states and msg in ['1', '2', '3', '4', '5']:
-                        keyboard = VkKeyboard(one_time=False)
-                        keyboard.add_openlink_button(
-                            text='Перейти в сообщество',
-                            link='https://vk.com/club148920320',
-                            payload={'button': 'link'}
-                        )
-                        send_msg(id, "перейдите в сообщество и в меню нажмите получать статьи для получения дальнейшей информации", keyboard)
                     if id not in users:
                         users[id] = 1
                         dats[id] = {"phase":0, "step":0, "data":{}}  # Инициализируем сразу
