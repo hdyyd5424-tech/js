@@ -77,8 +77,51 @@ while True:
                         send_msg(id, "Заполните анкету и я с вами свяжусь в ближайшее время")
                         send_msg(id, questions['name'])  # Шаг 0
                         continue
+                    if states.get(id) == "waiting_agreement":
+                        if msg == "да":
+                            keyboard = VkKeyboard(one_time=False)
+                            keyboard.add_openlink_button(
+                                label='Перейти в сообщество', 
+                                link='https://vk.com/club148920320'
+                            )
+                            
+                            final_text = "Отлично, я свяжусь с вами в ближайшее время, а также рекомендую подписаться на мою группу и получать полезные фишки."
+                            photo_path = "my_photo.jpg" 
+                            attachment = get_photo_attachment(photo_path)
+                            
+                            vk_session.method("messages.send", {
+                                "user_id": id,
+                                "message": final_text,
+                                "attachment": attachment if attachment else "",
+                                "random_id": random.randint(0, 100000),
+                                "keyboard": keyboard.get_keyboard()
+                            })
+    
+                            # Отчет админу
+                            ans_data = "".join([f"{questions[k]}: {dats[id]['data'].get(k, 'Нет ответа')}\n" for k in steps])
+                            report = (f"НОВАЯ ЗАЯВКА!\nУслуга №: {dats[id].get('user_selected_service', '?')}\n"
+                                     f"Согласие: ДА\n\n{ans_data}\nПрофиль: https://vk.com/id{id}")
+                            send_msg(adm_id, report)
+                            
+                            # Очистка, чтобы можно было заполнить снова
+                            del states[id]
+                            del users[id] 
+                            continue
+
+                # Этап: Ожидание выбора цифры
+                elif states.get(id) == "waiting_choice":
+                    if msg in ['1', '2', '3', '4', '5']:
+                        dats[id]['user_selected_service'] = msg
+                        keyboard = VkKeyboard(one_time=True)
+                        keyboard.add_button("ДА", VkKeyboardColor.POSITIVE)
+                        send_msg(id, "Даю согласие на обработку персональных данных", keyboard)
+                        states[id] = "waiting_agreement"
+                        continue
+                    else:
+                        send_msg(id, "Пожалуйста, введите цифру от 1 до 5.")
+                        continue
                     print(dats[id]["step"])
-                    if dats[id]["step"] < len(steps)-1:
+                    if dats[id]["step"] < len(steps):
                         dats[id]['data'][steps[dats[id]["step"]]] = msg
                         dats[id]["step"]+=1
                         if dats[id]["step"] in [5, 17, 18, 20, 7]:
@@ -133,10 +176,7 @@ while True:
                                 send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
                         else:
                             send_msg(id, questions[steps[dats[id]["step"]]])
-                    elif dats[id]["step"] >= len(steps)-1 and dats[id]['step'] != 999:
-                        dats[id]['data'][steps[dats[id]["step"]]] = msg
-                        dats[id]['step'] = 999
-                        
+                    else:
                         send_msg(id, "Благодарю за ответы!")
                         send_msg(id, "Чем я могу быть вам полезна? \n (поставьте цифру) \n "
                                      "1. Скорректировать свой вес (набрать / снизить вес) \n "
@@ -145,45 +185,5 @@ while True:
                                      "4. Хочу участвовать в марафоне стройности \n "
                                      "5. Вас интересует дополнительный доход?")
                         states[id] = "waiting_choice"
-
-                    elif states.get(id) == "waiting_choice" and msg in ['1', '2', '3', '4', '5']:
-                        dats[id]['user_selected_service'] = msg # Сохраняем выбор
-                        
-                        keyboard = VkKeyboard(one_time=True)
-                        keyboard.add_button("ДА", VkKeyboardColor.POSITIVE)
-                        
-                        send_msg(id, "Даю согласие на обработку персональных данных", keyboard)
-                        states[id] = "waiting_agreement"
-
-                    elif states.get(id) == "waiting_agreement" and msg == "да":
-                        # Создаем кнопку-ссылку
-                        keyboard = VkKeyboard(one_time=False)
-                        keyboard.add_openlink_button(
-                            label='Перейти в сообщество', 
-                            link='https://vk.com/club148920320'
-                        )
-                        
-                        final_text = "Отлично, я свяжусь с вами в ближайшее время, а также рекомендую подписаться на мою группу и получать полезные фишки."
-                        
-                        # Путь к картинке (проверь, чтобы файл реально лежал рядом с .py)
-                        photo_path = "my_photo.jpg" 
-                        attachment = get_photo_attachment(photo_path)
-                        
-                        # Отправляем сообщение через прямой метод API (чтобы вложить фото и клавиатуру)
-                        vk_session.method("messages.send", {
-                            "user_id": id,
-                            "message": final_text,
-                            "attachment": attachment if attachment else "",
-                            "random_id": random.randint(0, 100000),
-                            "keyboard": keyboard.get_keyboard()
-                        })
-
-                        # Отправляем полный отчет админу
-                        values = [f"{questions[k]}: {dats[id]['data'][k]}\n" for k in dats[id]['data']]
-                        report = (f"НОВАЯ ЗАЯВКА!\nУслуга: {dats[id]['user_selected_service']}\n"
-                                 f"Согласие: ДАНO\n\n{''.join(values)}\nПрофиль: https://vk.com/id{id}")
-                        send_msg(adm_id, report)
-                        
-                        del states[id] # Очищаем состояние
     except Exception as e:
         print("Ошибка:", e)
