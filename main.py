@@ -4,6 +4,18 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 import random
 import os
 from dotenv import load_dotenv
+from vk_api import VkUpload
+upload = VkUpload(vk_session)
+
+def get_photo_attachment(photo_path):
+    try:
+        photo = upload.photo_messages(photos=photo_path)[0]
+        return f"photo{photo['owner_id']}_{photo['id']}"
+    except Exception as e:
+        print(f"Ошибка загрузки фото: {e}")
+        return None
+
+
 load_dotenv()
 new_token = os.getenv('BOT_TOKEN')
 old_token = 'vk1.a.mXrRpgPJA-bwuyIov4iafRQyZrKkO9ksxMrvzQu1i9qPcCkyMG0rBVLK2UY1dhhPi7nid7LvNH1rkHJ7viio23TqWlv2uv7BuFcdMRNGr4xnaIvDk5K2yB6z4-y1NvOlpWi8HlMDwnZd-2D5Ve6fEdtWrERaYU7CACAGpI43II6zJq3iSdU9zNn48WO18uMOfJ8IONFFDRUVbKsrVJD2Fg'
@@ -129,14 +141,56 @@ while True:
                         else:
                             send_msg(id, questions[steps[dats[id]["step"]]])
                     elif dats[id]["step"] >= len(steps)-1 and dats[id]['step'] != 999:
+                        dats[id]['data'][steps[dats[id]["step"]]] = msg
                         dats[id]['step'] = 999
-                        send_msg(id, "Чем я могу быть вам полезна? \n (поставьте цифру) \n 1. Скорректировать свой вес (набрать / снизить вес) \n 2. Консультация по рациону питания \n 3. Приобрести продукт - доставка во все регионы \n 4. Хочу учавствовать в марафоне стройности \n 5. Вас интересует дополнительный доход?")
-                        states[id] = True
-                        values = []
-                        for data in list(dats[id]['data'].keys()):
-                            values.append(questions[data]+":"+dats[id]['data'][data]+"\n")
-                        values.append("vk: "+str(id))
-                        value = ''.join(values)
-                        send_msg(adm_id, value)
+                        
+                        send_msg(id, "Благодарю за ответы!")
+                        send_msg(id, "Чем я могу быть вам полезна? \n (поставьте цифру) \n "
+                                     "1. Скорректировать свой вес (набрать / снизить вес) \n "
+                                     "2. Консультация по рациону питания \n "
+                                     "3. Приобрести продукт - доставка во все регионы \n "
+                                     "4. Хочу участвовать в марафоне стройности \n "
+                                     "5. Вас интересует дополнительный доход?")
+                        states[id] = "waiting_choice"
+
+                    elif states.get(id) == "waiting_choice" and msg in ['1', '2', '3', '4', '5']:
+                        dats[id]['user_selected_service'] = msg # Сохраняем выбор
+                        
+                        keyboard = VkKeyboard(one_time=True)
+                        keyboard.add_button("ДА", VkKeyboardColor.POSITIVE)
+                        
+                        send_msg(id, "Даю согласие на обработку персональных данных", keyboard)
+                        states[id] = "waiting_agreement"
+
+                    elif states.get(id) == "waiting_agreement" and msg == "да":
+                        # Создаем кнопку-ссылку
+                        keyboard = VkKeyboard(one_time=False)
+                        keyboard.add_openlink_button(
+                            label='Перейти в сообщество', 
+                            link='https://vk.com/club148920320'
+                        )
+                        
+                        final_text = "Отлично, я свяжусь с вами в ближайшее время, а также рекомендую подписаться на мою группу и получать полезные фишки."
+                        
+                        # Путь к картинке (проверь, чтобы файл реально лежал рядом с .py)
+                        photo_path = "my_photo.jpg" 
+                        attachment = get_photo_attachment(photo_path)
+                        
+                        # Отправляем сообщение через прямой метод API (чтобы вложить фото и клавиатуру)
+                        vk_session.method("messages.send", {
+                            "user_id": id,
+                            "message": final_text,
+                            "attachment": attachment if attachment else "",
+                            "random_id": random.randint(0, 100000),
+                            "keyboard": keyboard.get_keyboard()
+                        })
+
+                        # Отправляем полный отчет админу
+                        values = [f"{questions[k]}: {dats[id]['data'][k]}\n" for k in dats[id]['data']]
+                        report = (f"НОВАЯ ЗАЯВКА!\nУслуга: {dats[id]['user_selected_service']}\n"
+                                 f"Согласие: ДАНO\n\n{''.join(values)}\nПрофиль: https://vk.com/id{id}")
+                        send_msg(adm_id, report)
+                        
+                        del states[id] # Очищаем состояние
     except Exception as e:
         print("Ошибка:", e)
