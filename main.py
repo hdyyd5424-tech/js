@@ -161,7 +161,6 @@ while True:
 
                             kb.add_button("Повысить энергию", VkKeyboardColor.PRIMARY)
 
-                            send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
 
                         elif next_step_idx == 20:
                             kb = VkKeyboard(one_time=True)
@@ -175,7 +174,6 @@ while True:
 
                             kb.add_button("ZOOM", VkKeyboardColor.PRIMARY)
 
-                            send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
 
                         elif next_step_idx == 7:
                             kb = VkKeyboard(one_time=True)
@@ -193,7 +191,6 @@ while True:
 
                             kb.add_button("только небольшие перекусы", VkKeyboardColor.PRIMARY)
 
-                            send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
 
                         elif next_step_idx == 17:
                             kb = VkKeyboard(one_time=True)
@@ -211,7 +208,6 @@ while True:
 
                             kb.add_button("Пью в основном чай / кофе / газировки", VkKeyboardColor.PRIMARY)
 
-                            send_msg(id, questions[steps[dats[id]["step"]]], keyboard)
 
                         elif next_step_idx == 18:
                             kb = VkKeyboard(one_time=True)
