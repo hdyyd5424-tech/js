@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 base_path = os.path.dirname(os.path.abspath(__file__))
 photo_path = os.path.join(base_path, "my_photo.jpg")
+
 load_dotenv()
 new_token = os.getenv('BOT_TOKEN')
 
@@ -16,13 +17,13 @@ longpoll = VkLongPoll(vk_session)
 adm_id = 17692663
 upload = VkUpload(vk_session)
 
-def get_photo_attachment(photo_path):
-    if not os.path.exists(photo_path):
-        print(f"!!! ФАЙЛ НЕ НАЙДЕН: {photo_path}")
+def get_photo_attachment(p_path):
+    if not os.path.exists(p_path):
+        print(f"!!! ФАЙЛ НЕ НАЙДЕН: {p_path}")
         return None
     try:
-        response = upload.photo_messages(photos=photo_path)
-        print(f"Ответ VK при загрузке: {response}") # Посмотрим, что пришло
+        response = upload.photo_messages(photos=p_path)
+        print(f"Ответ VK при загрузке: {response}") 
         if response:
             photo = response[0]
             return f"photo{photo['owner_id']}_{photo['id']}"
@@ -124,112 +125,75 @@ while True:
 
                 # 3. ПРОЦЕСС АНКЕТЫ
                 current_step_idx = users_data[user_id]["step"]
-                if current_step_idx < len(steps):
-                    # Записываем ответ на текущий вопрос
-                    current_field = steps[current_step_idx]
-                    users_data[user_id]["answers"][current_field] = event.text
+                
+                # Записываем ответ на текущий вопрос
+                current_field = steps[current_step_idx]
+                users_data[user_id]["answers"][current_field] = event.text
+                
+                # Шагаем вперед
+                users_data[user_id]["step"] += 1
+                next_step_idx = users_data[user_id]["step"]
+
+                # Если еще есть вопросы — генерируем клавиатуры и задаем следующий
+                if next_step_idx < len(steps):
+                    kb = None
                     
-                    # Переходим к следующему
-                    users_data[user_id]["step"] += 1
-                    next_step_idx = users_data[user_id]["step"]
+                    if next_step_idx == 5:
+                        kb = VkKeyboard(one_time=True)
+                        kb.add_button("Снижение веса", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Набор массы", VkKeyboardColor.PRIMARY)
+                        kb.add_line()
+                        kb.add_button("Разобраться в питании", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Улучшить самочувствие", VkKeyboardColor.PRIMARY)
+                        kb.add_line()
+                        kb.add_button("Качество тела", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Наладить работу ЖКТ", VkKeyboardColor.PRIMARY)
+                        kb.add_line()
+                        kb.add_button("Наладить сон", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Повысить энергию", VkKeyboardColor.PRIMARY)
 
-                    # Если еще есть вопросы
-                    if next_step_idx < len(steps):
-                        kb = None
-                        # Проверка на спец. клавиатуры для конкретных шагов
-                        if next_step_idx == 5:
-                            kb = VkKeyboard(one_time=True)
-                            kb.add_button("Снижение веса", VkKeyboardColor.PRIMARY)
+                    elif next_step_idx == 7:
+                        kb = VkKeyboard(one_time=True)
+                        kb.add_button("12ч", VkKeyboardColor.PRIMARY)
+                        kb.add_button("13ч", VkKeyboardColor.PRIMARY)
+                        kb.add_button("14ч", VkKeyboardColor.PRIMARY)
+                        kb.add_button("15ч", VkKeyboardColor.PRIMARY)
+                        kb.add_line()
+                        kb.add_button("нет обеда совсем", VkKeyboardColor.PRIMARY)
+                        kb.add_button("только небольшие перекусы", VkKeyboardColor.PRIMARY)
 
-                            kb.add_button("Набор массы", VkKeyboardColor.PRIMARY)
+                    elif next_step_idx == 17:
+                        kb = VkKeyboard(one_time=True)
+                        kb.add_button("нет", VkKeyboardColor.PRIMARY)
+                        kb.add_button("До 0,5 литров", VkKeyboardColor.PRIMARY)
+                        kb.add_button("От 0,5 до 1 литра", VkKeyboardColor.PRIMARY)
+                        kb.add_line()
+                        kb.add_button("От 1 до 2 литров", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Более 2 литров", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Пью в основном чай / кофе / газировки", VkKeyboardColor.PRIMARY)
 
-                            kb.add_line()
+                    elif next_step_idx == 18:
+                        kb = VkKeyboard(one_time=True)
+                        kb.add_button("Вздутие живота", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Диарея", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Запоры", VkKeyboardColor.PRIMARY)
+                        kb.add_line()
+                        kb.add_button("Изжога", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Нет", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Реакция на определенные продукты", VkKeyboardColor.PRIMARY)
 
-                            kb.add_button("Разобраться в питании", VkKeyboardColor.PRIMARY)
+                    elif next_step_idx == 20:
+                        kb = VkKeyboard(one_time=True)
+                        kb.add_button("Telegram", VkKeyboardColor.PRIMARY)
+                        kb.add_button("Vk", VkKeyboardColor.PRIMARY)
+                        kb.add_line()
+                        kb.add_button("Max", VkKeyboardColor.PRIMARY)
+                        kb.add_button("ZOOM", VkKeyboardColor.PRIMARY)
 
-                            kb.add_button("Улучшить самочувствие", VkKeyboardColor.PRIMARY)
-
-                            kb.add_line()
-
-                            kb.add_button("Качество тела", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Наладить работу ЖКТ", VkKeyboardColor.PRIMARY)
-
-                            kb.add_line()
-
-                            kb.add_button("Наладить сон", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Повысить энергию", VkKeyboardColor.PRIMARY)
-
-
-                        elif next_step_idx == 20:
-                            kb = VkKeyboard(one_time=True)
-                            kb.add_button("Telegram", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Vk", VkKeyboardColor.PRIMARY)
-
-                            kb.add_line()
-
-                            kb.add_button("Max", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("ZOOM", VkKeyboardColor.PRIMARY)
-
-
-                        elif next_step_idx == 7:
-                            kb = VkKeyboard(one_time=True)
-                            kb.add_button("12ч", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("13ч", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("14ч", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("15ч", VkKeyboardColor.PRIMARY)
-
-                            kb.add_line()
-
-                            kb.add_button("нет обеда совсем", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("только небольшие перекусы", VkKeyboardColor.PRIMARY)
-
-
-                        elif next_step_idx == 17:
-                            kb = VkKeyboard(one_time=True)
-                            kb.add_button("нет", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("До 0,5 литров", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("От 0,5 до 1 литра", VkKeyboardColor.PRIMARY)
-
-                            kb.add_line()
-
-                            kb.add_button("От 1 до 2 литров", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Более 2 литров", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Пью в основном чай / кофе / газировки", VkKeyboardColor.PRIMARY)
-
-
-                        elif next_step_idx == 18:
-                            kb = VkKeyboard(one_time=True)
-                            kb.add_button("Вздутие живота", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Диарея", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Запоры", VkKeyboardColor.PRIMARY)
-
-                            kb.add_line()
-
-                            kb.add_button("Изжога", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Нет", VkKeyboardColor.PRIMARY)
-
-                            kb.add_button("Реакция на определенные продукты", VkKeyboardColor.PRIMARY)
-
-                            #keyboard.add_button("Другое", VkKeyboardColor.PRIMARY)
-
+                    # ОТПРАВКА СЛЕДУЮЩЕГО ВОПРОСА (один вызов для всех шагов)
                     send_msg(user_id, questions[steps[next_step_idx]], kb)
                     
-                    # Если вопросы закончились
+                # ВАЖНО: Этот блок else теперь на одном уровне с 'if next_step_idx < len(steps):'
                 else:
                     send_msg(user_id, "Благодарю за ответы!")
                     choices = ("Чем я могу быть вам полезна?\n(введите цифру)\n"
